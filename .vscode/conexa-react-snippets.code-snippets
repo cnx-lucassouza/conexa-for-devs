@@ -1,0 +1,70 @@
+{
+  "styles": {
+    "prefix": "cstyles",
+    "body": [
+      "import { makeStyles, css } from '@conexasaude/hero'",
+      "",
+      "const useStyles = makeStyles({",
+      "  root: ({ colors }) => css``,",
+      "})",
+      "",
+      "export default useStyles"
+    ],
+    "description": "Create ReactJS Style file based on Conexa Front Styleguide"
+  },
+
+  "componentFunctionalTypescript": {
+    "prefix": "crfc",
+    "body": [
+      "import { FunctionComponent } from 'react'",
+      "",
+      "// import useStyles from './styles'",
+      "",
+      "const ${1:${TM_DIRECTORY/^.*(\\/|\\\\)([^(\\/|\\\\)]+)$/$2/}}: FunctionComponent = () => {",
+      "  // const styles = useStyles()",
+      "",
+      "  return <div />",
+      "}",
+      "",
+      "export default ${1:${TM_DIRECTORY/^.*(\\/|\\\\)([^(\\/|\\\\)]+)$/$2/}}"
+    ],
+    "description": "Create ReactJS Functional Component Typescript based on Conexa Front Styleguide"
+  },
+
+  "createContextTypescript": {
+    "prefix": "cctx",
+    "body": [
+      "import { createContext, useState, FunctionComponent, useContext } from 'react'",
+      "",
+      "interface I${1:${TM_DIRECTORY/^.*(\\/|\\\\)([^(\\/|\\\\)]+)$/$2/}}Context {",
+      "  value: string",
+      "}",
+      "",
+      "const ${1:${TM_DIRECTORY/^.*(\\/|\\\\)([^(\\/|\\\\)]+)$/$2/}}Context = createContext<I${1:${TM_DIRECTORY/^.*(\\/|\\\\)([^(\\/|\\\\)]+)$/$2/}}Context>(null)",
+      "",
+      "export const AuthProvider: FunctionComponent = ({ children }) => {",
+      "  const [value, setValue] = useState('myContext')",
+      "",
+      "  return (",
+      "    <${1:${TM_DIRECTORY/^.*(\\/|\\\\)([^(\\/|\\\\)]+)$/$2/}}Context.Provider",
+      "      value={{",
+      "        value,",
+      "      }}",
+      "    >",
+      "      {children}",
+      "    </${1:${TM_DIRECTORY/^.*(\\/|\\\\)([^(\\/|\\\\)]+)$/$2/}}Context.Provider>",
+      "  )",
+      "}",
+      "",
+      "export const use${1:${TM_DIRECTORY/^.*(\\/|\\\\)([^(\\/|\\\\)]+)$/$2/}}Context = (): I${1:${TM_DIRECTORY/^.*(\\/|\\\\)([^(\\/|\\\\)]+)$/$2/}}Context => {",
+      "  const context = useContext(${1:${TM_DIRECTORY/^.*(\\/|\\\\)([^(\\/|\\\\)]+)$/$2/}}Context)",
+      "  if (!context) {",
+      "    throw new Error('use${1:${TM_DIRECTORY/^.*(\\/|\\\\)([^(\\/|\\\\)]+)$/$2/}}Context must be used within a ${1:${TM_DIRECTORY/^.*(\\/|\\\\)([^(\\/|\\\\)]+)$/$2/}}Provider')",
+      "  }",
+      "  return context",
+      "}",
+      ""
+    ],
+    "description": "Create ReactJS Context based on Conexa Front Styleguide"
+  }
+}

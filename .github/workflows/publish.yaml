@@ -1,0 +1,60 @@
+name: Deploy AWS S3
+
+env:
+  BUCKET_HML: ${{ secrets.BUCKET_HML }}
+  ID_CLOUD_HML: ${{ secrets.ID_CLOUD_HML }}
+  BUCKET_PROD: ${{ secrets.BUCKET_PROD }}
+  ID_CLOUD_PROD: ${{ secrets.ID_CLOUD_PROD }}
+on:
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Nodejs and npm
+        uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+          registry-url: https://npm.pkg.github.com/
+          scope: "@conexasaude"
+
+      - run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPMRC_TOKEN }}" > .npmrc
+      - run: echo "@conexasaude:registry=https://npm.pkg.github.com/" >> .npmrc
+
+      - name: Install dependencies
+        run: yarn --immutable
+
+      - name: Fix linting
+        run: yarn lint --fix
+
+      - name: Build Hml
+        if: ${{ github.ref == 'refs/heads/qa'}}
+        run: yarn build:hml
+
+      - name: Build Prd
+        if: ${{ github.ref == 'refs/heads/master'}}
+        run: yarn build:prod
+
+      - name: Config AWS
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          AWS-ACCESS-KEY-ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS-SECRET-ACCESS-KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS-region: sa-east-1
+
+      - name: Deploy homologation
+        if: ${{ github.ref == 'refs/heads/qa'}}
+        run: |
+          echo "Upload para o S3"
+          aws s3 sync ./build/ s3://${{env.BUCKET_HML}}
+          aws cloudfront create-invalidation --distribution-id ${{env.ID_CLOUD_HML}} --paths "/*"
+      - name: Deploy production
+        if: ${{ github.ref == 'refs/heads/master'}}
+        run: |
+          echo "Upload para o S3"
+          aws s3 sync ./build/ s3://${{env.BUCKET_PROD}}
+          aws cloudfront create-invalidation --distribution-id ${{env.ID_CLOUD_PROD}} --paths "/*"
